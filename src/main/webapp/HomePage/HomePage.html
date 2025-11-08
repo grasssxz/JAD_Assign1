@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Care Services - HTML</title>
+<style>
+  :root{
+    --purple:#d4d6e0;
+    --purple-border:#7f9cf5;
+    --banner:#aeb8d1;
+    --pill:#faf9d7;
+    --text:#111;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial, Helvetica, sans-serif;color:var(--text);background:#fff}
+
+  /* NAVBAR */
+  .navbar{
+    background:var(--purple);
+    border-bottom:2px solid var(--purple-border);
+    padding:18px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .nav-left,.nav-right{display:flex;align-items:center;gap:36px}
+  .nav-link{color:#fff;text-decoration:none;font-weight:500}
+  .nav-link:hover{text-decoration:underline}
+
+  /* TOP ICONS ROW (bell/heart) */
+  .icons-row{display:flex;justify-content:flex-end;gap:18px;margin:14px 28px 0}
+  .icon-btn{font-size:22px;cursor:pointer}
+
+  /* PROFILE ROW */
+  .profile{display:flex;align-items:center;gap:12px;margin:18px 28px}
+  .avatar{width:46px;height:46px;border-radius:50%;object-fit:cover}
+  .name{font-weight:600}
+
+  /* SEARCH */
+  .search-wrap{margin:14px 28px}
+  .search{display:flex;align-items:center;background:#efecef;border-radius:8px;padding:12px 14px}
+  .search input{border:0;outline:0;background:transparent;width:100%;font-size:16px}
+
+  /* BANNER / CAROUSEL */
+/* ====== BANNER / CAROUSEL ====== */
+.banner {
+  margin: 20px auto;
+  max-width: 900px;           /* keeps it from stretching too wide */
+  height: 180px;              /* smaller height so it doesn’t dominate the screen */
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  background: var(--banner);
+}
+
+/* Slide images */
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;         /* show full image, not zoomed */
+  object-position: right center; /* keep focus to right side */
+  background-color: var(--banner);
+  display: none;
+}
+
+.slide.active {
+  display: block;
+  animation: fade 0.8s ease-in-out;
+}
+
+@keyframes fade {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+/* Text overlay */
+.banner-text {
+  position: absolute;
+  top: 35%;                  /* slightly lower */
+  left: 5%;                  /* closer to edge */
+  width: 45%;                /* restrict width so text doesn’t spread under image */
+  color: #fff;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.banner-text h2 {
+  margin: 0;
+  font-size: 24px;           /* smaller text so it fits */
+  font-weight: 700;
+}
+
+.banner-text p {
+  margin-top: 6px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+/* Dots */
+.dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: white;
+}
+
+
+
+  /* SERVICES */
+  .services-head{display:flex;justify-content:center;margin:22px 0 8px}
+  .pill{background:var(--pill);padding:8px 20px;border-radius:6px;font-weight:700}
+  .cards{display:flex;gap:56px;justify-content:center;flex-wrap:wrap;margin:16px 0 50px}
+  .card{text-align:center;max-width:210px}
+  .card img{width:155px;height:155px;border-radius:24px;object-fit:cover;display:block;margin:0 auto 8px}
+  .caption{margin-top:6px;font-size:13px;color:#333}
+  /* Small tweak for tablets */
+  @media (max-width:900px){
+    .nav-left,.nav-right{gap:20px}
+    .cards{gap:32px}
+    .card img{width:140px;height:140px}
+  }
+  .book-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #7f9cf5;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.book-btn:hover {
+  background-color: #5f7ae0;
+}
+  
+</style>
+</head>
+<body>
+<iframe src="NavBar.html"></iframe>
+
+
+  <!-- Right-side icons -->
+  <div class="icons-row">
+    <span class="icon-btn">🔔</span>
+    <span class="icon-btn">♡</span>
+  </div>
+
+  <!-- PROFILE -->
+  <section class="profile">
+    <img class="avatar" src="../Images/profile.jpg" alt="Profile"/>
+    <span class="name">Sally Chew</span>
+  </section>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <div class="search">
+      <span style="margin-right:8px">🔍</span>
+      <input placeholder=""/>
+    </div>
+  </div>
+
+  <!-- BANNER / CAROUSEL -->
+  <section class="banner" id="banner">
+    <div class="banner-text" id="bannerText">
+      <h2 id="bTitle">We care about you</h2>
+      <p id="bSub">Select a service with us now</p>
+    </div>
+    <img class="slide active" src="../Images/caregiver_banner.webp" alt="Banner 1">
+    <img class="slide" src="../Images/cleaning.png" alt="Banner 2">
+    <img class="slide" src="../Images/doctor.png" alt="Banner 3">
+    <div class="dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </section>
+
+  
+  <!-- SERVICES SECTION -->
+<div class="services-head">
+  <div class="pill">Services</div>
+</div>
+
+<section class="cards">
+  <!-- CAREGIVING -->
+  <div class="card">
+    <img src="../Images/caregiver_banner.webp" alt="Caregiving">
+    <div><strong>CAREGIVING</strong></div>
+    
+    <a href="../Services/Caregiving/CaregiverFilter.html" class="book-btn">Book Service</a>
+  </div>
+
+  <!-- CLEANING -->
+  <div class="card">
+    <img src="../Images/cleaning.png" alt="Cleaning">
+    <div><strong>CLEANING</strong></div>
+    
+    <a href="../Services/Cleaning/CleanerFilter.html" class="book-btn">Book Service</a>
+  </div>
+
+  <!-- DOCTOR APPOINTMENTS -->
+  <div class="card">
+    <img src="../Images/doctor.png" alt="Doctor Appointments">
+    <div><strong>DOCTOR APPOINTMENTS</strong></div>
+    
+    <a href="../Services/DoctorAppt/DoctorFilter.html" class="book-btn">Book Service</a>
+  </div>
+</section>
+
+  <div style="text-align:center;margin-bottom:30px">
+    <a class="nav-link" href="HomePage.jsp" style="color:#3366cc;text-decoration:underline">Go to JSP version</a>
+  </div>
+
+<script>
+  // Lightweight carousel, matches the look
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+  const titles = [
+    'We care about you',
+    'We care about you',
+    'We care about you'
+  ];
+  const subs = [
+    'Select a service with us now',
+    'Select a service with us now',
+    'Select a service with us now'
+  ];
+  const tEl = document.getElementById('bTitle');
+  const sEl = document.getElementById('bSub');
+  let idx = 0;
+
+  function show(i){
+    slides.forEach((sl,k)=>sl.classList.toggle('active', k===i));
+    dots.forEach((d,k)=>d.classList.toggle('active', k===i));
+    tEl.textContent = titles[i];
+    sEl.textContent = subs[i];
+  }
+  function next(){ idx = (idx+1)%slides.length; show(idx); }
+  let timer = setInterval(next, 4000);
+  dots.forEach((d,i)=>d.addEventListener('click', ()=>{ clearInterval(timer); idx=i; show(i); timer=setInterval(next,4000); }));
+</script>
+</body>
+</html>
