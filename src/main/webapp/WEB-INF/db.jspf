@@ -1,0 +1,23 @@
+<%@ page import="java.sql.*" %>
+<%
+/*
+  db.jspf
+  - Reusable DB connection fragment.
+  - Opens a Connection named `conn`. Do NOT redeclare `conn` in pages that include this.
+  - The including JSP is responsible for closing `conn` in its finally block.
+*/
+Connection conn = null;
+try {
+    // UPDATE credentials for your setup:
+    String url  = "jdbc:mysql://localhost:3306/jad_assign1?useSSL=false&serverTimezone=UTC&characterEncoding=utf8";
+    String user = "root";
+    String pass = "1G9r5a6c1E**";
+
+    Class.forName("com.mysql.cj.jdbc.Driver");
+    conn = DriverManager.getConnection(url, user, pass);
+
+} catch (Exception e) {
+    // Surface a friendly message but keep details in server logs
+    throw new ServletException("Unable to connect to database.", e);
+}
+%>
