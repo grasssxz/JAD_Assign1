@@ -12,7 +12,7 @@
         Class.forName("com.mysql.cj.jdbc.Driver");  // Updated driver for newer MySQL connector
 
         // Step 2: Define Connection URL
-        String connURL = "jdbc:mysql://localhost/jspg?user=root&password=root&serverTimezone=UTC";
+        String connURL = "jdbc:mysql://localhost:3306/jad_assign1?user=root&password=1G9r5a6c1E**&serverTimezone=UTC";
 
         // Step 3: Establish connection
         Connection conn = DriverManager.getConnection(connURL);
