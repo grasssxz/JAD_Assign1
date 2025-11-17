@@ -1,2 +1,9 @@
 eclipse.preferences.version=1
+encoding//src/main/webapp/Services/DoctorAppt/DoctorDeleteReview.jsp=UTF-8
+encoding//src/main/webapp/Services/DoctorAppt/DoctorDetailsData.jsp=UTF-8
+encoding//src/main/webapp/Services/DoctorAppt/DoctorListResults.jsp=UTF-8
+encoding//src/main/webapp/Services/DoctorAppt/DoctorUpdateReview.jsp=UTF-8
+encoding//src/main/webapp/Services/Meal_Delivery/MealDeliveryData.jsp=UTF-8
+encoding//src/main/webapp/Services/Meal_Delivery/add_to_cart.jsp=UTF-8
+encoding//src/main/webapp/Services/Meal_Delivery/checkout.jsp=UTF-8
 encoding/<project>=UTF-8

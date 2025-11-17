@@ -21,7 +21,7 @@
         Statement stmt = conn.createStatement();
 
         // Step 5: Execute SQL Command
-        String sqlStr = "SELECT * FROM service";   // <-- your table name
+        String sqlStr = "SELECT * FROM service";   
         ResultSet rs = stmt.executeQuery(sqlStr);
 
         // Step 6: Process Result
