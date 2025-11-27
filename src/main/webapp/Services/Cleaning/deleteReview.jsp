@@ -45,7 +45,7 @@ conn.close();
 if (cleaningTypeId == 1) {
     response.sendRedirect(ctx + "/Services/Cleaning/HouseKeeping.jsp");
 } else if (cleaningTypeId == 2) {
-    response.sendRedirect(ctx + "/Services/Cleaning/springCleaning.jsp");
+    response.sendRedirect(ctx + "/Services/Cleaning/DpringCleaning.jsp");
 } else if (cleaningTypeId == 3) {
     response.sendRedirect(ctx + "/Services/Cleaning/postRenovation.jsp");
 } else {

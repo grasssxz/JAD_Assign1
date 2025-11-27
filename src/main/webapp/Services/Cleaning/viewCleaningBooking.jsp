@@ -6,7 +6,6 @@
    1. DB CONNECTION
 ================================*/
 Class.forName("com.mysql.cj.jdbc.Driver");
-Class.forName("com.mysql.cj.jdbc.Driver");
 String connURL =
 "jdbc:mysql://localhost:3306/jad_assign1"
 + "?user=root"
@@ -25,11 +24,82 @@ Integer memberId = (Integer) session.getAttribute("member_id");
 
 if (memberId == null) {
     response.sendRedirect(ctx + "/login/login.html");
+
     return;
+}
+String pageMessage = null;
+
+/* ===============================
+3. HANDLE CANCEL (DELETE) BOOKING
+================================*/
+String action = request.getParameter("action");
+String cancelIdParam = request.getParameter("bookingId");
+
+if ("cancel".equals(action) && cancelIdParam != null) {
+ try {
+     int cancelId = Integer.parseInt(cancelIdParam);
+
+     // Check that this booking belongs to this member and is not paid
+     PreparedStatement psCheck = conn.prepareStatement(
+         "SELECT cb.member_id, COALESCE(cp.status, 'pending') AS pay_status " +
+         "FROM cleaner_booking cb " +
+         "LEFT JOIN cleaner_payment cp ON cp.booking_id = cb.id " +
+         "WHERE cb.id = ?"
+     );
+     psCheck.setInt(1, cancelId);
+     ResultSet rsCheck = psCheck.executeQuery();
+
+     boolean canDelete = false;
+     String payStatus = null;
+     int ownerId = -1;
+
+     if (rsCheck.next()) {
+    	    ownerId   = rsCheck.getInt("member_id");
+    	    payStatus = rsCheck.getString("pay_status");
+    	    
+    	    // allow owner to delete regardless of payment
+    	    if (ownerId == memberId) {
+    	        canDelete = true;
+    	    }
+    	}
+
+     rsCheck.close();
+     psCheck.close();
+
+     if (canDelete) {
+         // Delete any payments linked to this booking (safe in case there is a row)
+         PreparedStatement psDelPay = conn.prepareStatement(
+             "DELETE FROM cleaner_payment WHERE booking_id = ?"
+         );
+         psDelPay.setInt(1, cancelId);
+         psDelPay.executeUpdate();
+         psDelPay.close();
+
+         // Now delete the booking itself, only if it's mine
+         PreparedStatement psDelBook = conn.prepareStatement(
+             "DELETE FROM cleaner_booking WHERE id = ? AND member_id = ?"
+         );
+         psDelBook.setInt(1, cancelId);
+         psDelBook.setInt(2, memberId);
+         psDelBook.executeUpdate();
+         psDelBook.close();
+
+         pageMessage = "Booking cancelled successfully.";
+     } else {
+         if ("paid".equalsIgnoreCase(payStatus)) {
+             pageMessage = "You cannot cancel a paid booking.";
+         } else {
+             pageMessage = "Booking not found or not owned by you.";
+         }
+     }
+
+ } catch (Exception e) {
+     pageMessage = "Error cancelling booking: " + e.getMessage();
+ }
 }
 
 /* ===============================
-   3. LOAD BOOKINGS FOR THIS MEMBER
+   4. LOAD BOOKINGS FOR THIS MEMBER
 ================================*/
 PreparedStatement ps = conn.prepareStatement(
     "SELECT cb.id AS booking_id, cb.date, cb.hours, cb.status AS booking_status, " +
@@ -114,6 +184,11 @@ h1 {
    href="<%=request.getContextPath()%>/home/HomePage.jsp">
     ← Back to Home Page
 </a>
+
+<% if (pageMessage != null) { %>
+  <p style="color:#c0392b; font-weight:bold;"><%= pageMessage %></p>
+<% } %>
+
 <%
 boolean hasBookings = false;
 
@@ -139,12 +214,10 @@ while (rs.next()) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         paidAtStr = sdf.format(paidAt);
     }
-
 %>
 
 <div class="booking-card">
 
-  <!-- Cleaner image -->
   <img class="book-img" src="<%= ctx %>/Services/Cleaning/Images/<%= profileUrl %>" />
 
   <div>
@@ -157,43 +230,47 @@ while (rs.next()) {
       Booking Status: <%= bookingStatus %>
     </p>
 
-    <p>
-      <strong>Amount:</strong> 
+    <p><strong>Amount:</strong> 
       <%= amount != null ? "$" + String.format("%.2f", amount) : "-" %>
     </p>
 
-    <p class="status-box 
-        <%= "paid".equals(paymentStatus) ? "paid" : 
-            "failed".equals(paymentStatus) ? "failed" : "pending" %>">
-      Payment Status: <%= paymentStatus != null ? paymentStatus : "-" %>
-      <br>
-       Paid at: <%= paidAtStr %>
-    
-
-    <% if (!"paid".equals(paymentStatus)) { %>
+        <% if (!"paid".equals(paymentStatus)) { %>
       <a class="pay-btn" href="<%= ctx %>/Services/Cleaning/cleanerPayment.jsp?bookingId=<%= bookingId %>">
         Pay Now
       </a>
     <% } %>
-  </div>
 
+    <!-- Always allow cancel (your server-side will double-check anyway) -->
+    <form method="post"
+          action="<%= ctx %>/Services/Cleaning/viewCleaningBooking.jsp"
+          style="display:inline-block; margin-left:8px;"
+          onsubmit="return confirm('Cancel this booking?');">
+      <input type="hidden" name="action" value="cancel">
+      <input type="hidden" name="bookingId" value="<%= bookingId %>">
+      <button type="submit"
+              style="background:#e11d48; color:white; border:none; border-radius:6px; padding:6px 12px; cursor:pointer;">
+        Cancel Booking
+      </button>
+    </form>
+
+
+  </div>
 </div>
 
-<% } // end loop %>
-
 <%
+} // <-- CLOSE THE WHILE LOOP PROPERLY!!!!
+
 if (!hasBookings) {
 %>
   <p>You have no bookings yet.</p>
 <%
 }
-%>
 
-<%
 rs.close();
 ps.close();
 conn.close();
 %>
+
 
 </body>
 </html>

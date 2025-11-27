@@ -144,7 +144,11 @@ button:hover {
 
 <h1>🛠 Manage Categories</h1>
 
-<a href="<%= ctx %>/admin/admin_homePage.jsp">← Back to Admin Home</a>
+<a class="btn" 
+   style="background:#64748b; color:white;"
+   href="<%=request.getContextPath()%>/admin/admin_homePage.jsp">
+    ← Back to Home Page
+</a>
 
 <!-- ADD CATEGORY -->
 <div class="add-form">

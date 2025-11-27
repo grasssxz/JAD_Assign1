@@ -43,100 +43,126 @@ psTypes.close();
 if ("addCleaner".equals(action)) {
     String name = request.getParameter("name");
     String profileUrl = request.getParameter("profile_url");
-    double basePay = Double.parseDouble(request.getParameter("base_hourly_pay"));
+    String basePayStr = request.getParameter("base_hourly_pay");
     String race = request.getParameter("race");
     String lang = request.getParameter("language");
-    int years = Integer.parseInt(request.getParameter("years_experience"));
-    int minHours = Integer.parseInt(request.getParameter("min_work_hours"));
+    String yearsStr = request.getParameter("years_experience");
+    String maxBookingStr = request.getParameter("max_booking_per_day");
 
-    PreparedStatement psAdd = conn.prepareStatement(
-      "INSERT INTO cleaner (name, profile_url, base_hourly_pay, race, language, years_experience, min_work_hours) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS
-    );
-    psAdd.setString(1, name);
-    psAdd.setString(2, profileUrl);
-    psAdd.setDouble(3, basePay);
-    psAdd.setString(4, race);
-    psAdd.setString(5, lang);
-    psAdd.setInt(6, years);
-    psAdd.setInt(7, minHours);
-    psAdd.executeUpdate();
+    try {
+        double basePay = Double.parseDouble(basePayStr);
+        int years = Integer.parseInt(yearsStr);
+        int maxBooking = Integer.parseInt(maxBookingStr);
 
-    int newCleanerId = -1;
-    ResultSet rsKey = psAdd.getGeneratedKeys();
-    if (rsKey.next()) newCleanerId = rsKey.getInt(1);
-    rsKey.close();
-    psAdd.close();
-
-    // insert mappings
-    if (newCleanerId > 0) {
-        String[] selectedTypes = request.getParameterValues("typeIds");
-        if (selectedTypes != null) {
-            PreparedStatement psMap = conn.prepareStatement(
-              "INSERT INTO cleaner_cleaning_type (cleaner_id, cleaning_type_id) VALUES (?, ?)"
+        if (years < 0 || maxBooking < 0) {
+            message = "Years of experience and Max booking per day cannot be negative.";
+        } else {
+            PreparedStatement psAdd = conn.prepareStatement(
+              "INSERT INTO cleaner (name, profile_url, base_hourly_pay, race, language, years_experience, max_booking_per_day) " +
+              "VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS
             );
-            for (String t : selectedTypes) {
-                psMap.setInt(1, newCleanerId);
-                psMap.setInt(2, Integer.parseInt(t));
-                psMap.addBatch();
+            psAdd.setString(1, name);
+            psAdd.setString(2, profileUrl);
+            psAdd.setDouble(3, basePay);
+            psAdd.setString(4, race);
+            psAdd.setString(5, lang);
+            psAdd.setInt(6, years);
+            psAdd.setInt(7, maxBooking);
+            psAdd.executeUpdate();
+
+            int newCleanerId = -1;
+            ResultSet rsKey = psAdd.getGeneratedKeys();
+            if (rsKey.next()) newCleanerId = rsKey.getInt(1);
+            rsKey.close();
+            psAdd.close();
+
+            // insert mappings
+            if (newCleanerId > 0) {
+                String[] selectedTypes = request.getParameterValues("typeIds");
+                if (selectedTypes != null) {
+                    PreparedStatement psMap = conn.prepareStatement(
+                      "INSERT INTO cleaner_cleaning_type (cleaner_id, cleaning_type_id) VALUES (?, ?)"
+                    );
+                    for (String t : selectedTypes) {
+                        psMap.setInt(1, newCleanerId);
+                        psMap.setInt(2, Integer.parseInt(t));
+                        psMap.addBatch();
+                    }
+                    psMap.executeBatch();
+                    psMap.close();
+                }
             }
-            psMap.executeBatch();
-            psMap.close();
+            message = "Cleaner added.";
         }
+    } catch (NumberFormatException e) {
+        message = "Please enter valid numbers for base pay, years of experience and max booking per day.";
     }
-    message = "Cleaner added.";
 }
+
 
 // UPDATE cleaner
 if ("updateCleaner".equals(action)) {
     int cleanerId = Integer.parseInt(request.getParameter("id"));
     String name = request.getParameter("name");
     String profileUrl = request.getParameter("profile_url");
-    double basePay = Double.parseDouble(request.getParameter("base_hourly_pay"));
+    String basePayStr = request.getParameter("base_hourly_pay");
     String race = request.getParameter("race");
     String lang = request.getParameter("language");
-    int years = Integer.parseInt(request.getParameter("years_experience"));
-    int minHours = Integer.parseInt(request.getParameter("min_work_hours"));
+    String yearsStr = request.getParameter("years_experience");
+    String maxBookingStr = request.getParameter("max_booking_per_day");
 
-    PreparedStatement psUp = conn.prepareStatement(
-      "UPDATE cleaner SET name=?, profile_url=?, base_hourly_pay=?, race=?, language=?, years_experience=?, min_work_hours=? " +
-      "WHERE id=?"
-    );
-    psUp.setString(1, name);
-    psUp.setString(2, profileUrl);
-    psUp.setDouble(3, basePay);
-    psUp.setString(4, race);
-    psUp.setString(5, lang);
-    psUp.setInt(6, years);
-    psUp.setInt(7, minHours);
-    psUp.setInt(8, cleanerId);
-    psUp.executeUpdate();
-    psUp.close();
+    try {
+        double basePay = Double.parseDouble(basePayStr);
+        int years = Integer.parseInt(yearsStr);
+        int maxBooking = Integer.parseInt(maxBookingStr);
 
-    // reset mappings
-    PreparedStatement psDelMap = conn.prepareStatement(
-      "DELETE FROM cleaner_cleaning_type WHERE cleaner_id=?"
-    );
-    psDelMap.setInt(1, cleanerId);
-    psDelMap.executeUpdate();
-    psDelMap.close();
+        if (years < 0 || maxBooking < 0) {
+            message = "Years of experience and Max booking per day cannot be negative.";
+        } else {
+            PreparedStatement psUp = conn.prepareStatement(
+              "UPDATE cleaner SET name=?, profile_url=?, base_hourly_pay=?, race=?, language=?, years_experience=?, max_booking_per_day=? " +
+              "WHERE id=?"
+            );
+            psUp.setString(1, name);
+            psUp.setString(2, profileUrl);
+            psUp.setDouble(3, basePay);
+            psUp.setString(4, race);
+            psUp.setString(5, lang);
+            psUp.setInt(6, years);
+            psUp.setInt(7, maxBooking);
+            psUp.setInt(8, cleanerId);
+            psUp.executeUpdate();
+            psUp.close();
 
-    String[] selectedTypes = request.getParameterValues("typeIds_" + cleanerId);
-    if (selectedTypes != null) {
-        PreparedStatement psMap = conn.prepareStatement(
-          "INSERT INTO cleaner_cleaning_type (cleaner_id, cleaning_type_id) VALUES (?, ?)"
-        );
-        for (String t : selectedTypes) {
-            psMap.setInt(1, cleanerId);
-            psMap.setInt(2, Integer.parseInt(t));
-            psMap.addBatch();
+            // reset mappings
+            PreparedStatement psDelMap = conn.prepareStatement(
+              "DELETE FROM cleaner_cleaning_type WHERE cleaner_id=?"
+            );
+            psDelMap.setInt(1, cleanerId);
+            psDelMap.executeUpdate();
+            psDelMap.close();
+
+            String[] selectedTypes = request.getParameterValues("typeIds_" + cleanerId);
+            if (selectedTypes != null) {
+                PreparedStatement psMap = conn.prepareStatement(
+                  "INSERT INTO cleaner_cleaning_type (cleaner_id, cleaning_type_id) VALUES (?, ?)"
+                );
+                for (String t : selectedTypes) {
+                    psMap.setInt(1, cleanerId);
+                    psMap.setInt(2, Integer.parseInt(t));
+                    psMap.addBatch();
+                }
+                psMap.executeBatch();
+                psMap.close();
+            }
+
+            message = "Cleaner updated.";
         }
-        psMap.executeBatch();
-        psMap.close();
+    } catch (NumberFormatException e) {
+        message = "Please enter valid numbers for base pay, years of experience and max booking per day.";
     }
-
-    message = "Cleaner updated.";
 }
+
 
 // DELETE cleaner
 if ("deleteCleaner".equals(action)) {
@@ -291,18 +317,20 @@ table td{
     <input type="text" name="profile_url">
 
     <label>Base Hourly Pay (S$)</label>
-    <input type="number" step="0.1" name="base_hourly_pay" required>
+    <input type="number" step="0.1" name="base_hourly_pay" required min="0">
+
+	<label>Years Experience</label>
+	<input type="number" name="years_experience" value="0" min="0">
+
+	 <label>Max Booking Per day</label>
+	 <input type="number" name="max_booking_per_day" value="1" min="5">
 
     <label>Race</label>
     <input type="text" name="race">
 
     <label>Language</label>
     <input type="text" name="language">
-    <label>Years Experience</label>
-    <input type="number" name="years_experience" value="0">
 
-    <label>Min Work Hours</label>
-    <input type="number" name="min_work_hours" value="1">
 
     <label>Cleaning Types This Cleaner Supports:</label>
     <div class="types">
@@ -337,7 +365,7 @@ while(rsCleaners.next()){
   String race = rsCleaners.getString("race");
   String lang = rsCleaners.getString("language");
   int years = rsCleaners.getInt("years_experience");
-  int minH = rsCleaners.getInt("min_work_hours");
+  int maxBooking = rsCleaners.getInt("max_booking_per_day");
 
   // get current mappings
   PreparedStatement psMap = conn.prepareStatement(
@@ -367,7 +395,7 @@ while(rsCleaners.next()){
       <input type="text" name="profile_url" value="<%= purl %>">
 
       <label>Base Pay (S$)</label>
-      <input type="number" step="0.01" name="base_hourly_pay" value="<%= pay %>" required>
+      <input type="number" step="0.01" name="base_hourly_pay" value="<%= pay %>" min="10">
 
       <label>Race</label>
       <input type="text" name="race" value="<%= race %>">
@@ -376,10 +404,11 @@ while(rsCleaners.next()){
       <input type="text" name="language" value="<%= lang %>">
 
       <label>Years Experience</label>
-      <input type="number" name="years_experience" value="<%= years %>">
+	  <input type="number" name="years_experience" value="<%= years %>" min="0">
 
-      <label>Min Work Hours</label>
-      <input type="number" name="min_work_hours" value="<%= minH %>">
+	  <label>Max Booking Per Day</label>
+	  <input type="number" name="max_booking_per_day" value="<%= maxBooking %>" min="5">
+
 
       <label>Supports</label>
       <div class="types">
@@ -401,8 +430,8 @@ while(rsCleaners.next()){
 
   <td>
       <button type="submit">Save</button>
-    </form>
   </td>
+   </form>
 
   <td>
     <form method="post" action="editCleaners.jsp" onsubmit="return confirm('Delete this cleaner?');">

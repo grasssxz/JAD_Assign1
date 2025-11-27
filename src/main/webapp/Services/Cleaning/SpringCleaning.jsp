@@ -7,7 +7,6 @@
    1. SETUP & DB CONNECTION
 ================================*/
 Class.forName("com.mysql.cj.jdbc.Driver");
-Class.forName("com.mysql.cj.jdbc.Driver");
 String connURL =
 "jdbc:mysql://localhost:3306/jad_assign1"
 + "?user=root"
@@ -27,37 +26,37 @@ String profilePic = ctx + "/home/Images/profile.jpg";
    2. GET USER PROFILE PIC
 ================================*/
 PreparedStatement psUser = conn.prepareStatement(
-	    "SELECT id, profile_pic FROM member WHERE username = ?"
-	);
-	psUser.setString(1, username);
-	ResultSet rsUser = psUser.executeQuery();
+    "SELECT id, profile_pic FROM member WHERE username = ?"
+);
+psUser.setString(1, username);
+ResultSet rsUser = psUser.executeQuery();
 
-	int memberId = -1;
+int memberId = -1;
 
-	if (rsUser.next()) {
-	    memberId = rsUser.getInt("id");   // 💥 SET memberId properly
-	    String pp = rsUser.getString("profile_pic");
-	    if (pp != null && !pp.isEmpty()) {
-	        profilePic = ctx + "/Services/Cleaning/Images/" + pp;
-	    }
-	}
+if (rsUser.next()) {
+    memberId = rsUser.getInt("id");
+    String pp = rsUser.getString("profile_pic");
+    if (pp != null && !pp.isEmpty()) {
+        profilePic = ctx + "/Services/Cleaning/Images/" + pp;
+    }
+}
 
-	rsUser.close();
-	psUser.close();
+rsUser.close();
+psUser.close();
 
 /* ===============================
    3. READ FILTERS FROM REQUEST
 ================================*/
-int cleaningTypeId = 2; 
+int cleaningTypeId = 2; // SPRING CLEANING TYPE
 String[] selectedLangs = request.getParameterValues("lang");
 String priceOrder = request.getParameter("priceOrder");
 
 /* ===============================
-   4. BUILD CLEANER QUERY DYNAMICALLY
+   4. BUILD CLEANER QUERY
 ================================*/
 StringBuilder sql = new StringBuilder(
  "SELECT c.id, c.name, c.profile_url, c.base_hourly_pay, c.race, c.language, " +
- "       c.min_work_hours, (c.base_hourly_pay + ct.pay_increment) AS hourly_rate " +
+ "       c.max_booking_per_day, (c.base_hourly_pay + ct.pay_increment) AS hourly_rate " +
  "FROM cleaner c " +
  "JOIN cleaner_cleaning_type cct ON c.id = cct.cleaner_id " +
  "JOIN cleaning_type ct ON ct.id = cct.cleaning_type_id " +
@@ -74,7 +73,7 @@ if (selectedLangs != null && selectedLangs.length > 0) {
     sql.append(")");
 }
 
-// Price order
+// Price sorting
 if (priceOrder != null) {
     sql.append(" ORDER BY hourly_rate ASC");
 }
@@ -83,8 +82,8 @@ if (priceOrder != null) {
    5. PREPARE CLEANER QUERY
 ================================*/
 PreparedStatement psCleaners = conn.prepareStatement(sql.toString());
-
 int paramIndex = 1;
+
 psCleaners.setInt(paramIndex++, cleaningTypeId);
 
 if (selectedLangs != null && selectedLangs.length > 0) {
@@ -96,49 +95,50 @@ if (selectedLangs != null && selectedLangs.length > 0) {
 ResultSet rsCleaners = psCleaners.executeQuery();
 
 /* ===============================
-   6. SERVICE QUERY (IF YOU USE IT)
+   6. SERVICE CATEGORY BUTTONS
 ================================*/
 PreparedStatement psSvc = conn.prepareStatement(
     "SELECT name, service_link FROM service WHERE category_id = ?"
 );
+psSvc.setInt(1, 2);
+ResultSet rsSvc = psSvc.executeQuery();
 
 /* ===============================
-7. LEAVING A REVIEW
+   7. CLEANERS USER CAN REVIEW
 ================================*/
 PreparedStatement psReview = conn.prepareStatement(
-	    "SELECT DISTINCT c.id, c.name " +
-	    "FROM cleaner_booking b " +
-	    "JOIN cleaner c ON b.cleaner_id = c.id " +
-	    "WHERE b.member_id = ? " +
-	    "AND b.cleaning_type_id = ? " +
-	    "AND b.status = 'paid'"
-	);
-	psReview.setInt(1, memberId);
-	psReview.setInt(2, cleaningTypeId);
-	ResultSet rsEligible = psReview.executeQuery();
+    "SELECT DISTINCT c.id, c.name " +
+    "FROM cleaner_booking b " +
+    "JOIN cleaner c ON b.cleaner_id = c.id " +
+    "WHERE b.member_id = ? " +
+    "AND b.cleaning_type_id = ? " +
+    "AND b.status = 'paid'"
+);
+psReview.setInt(1, memberId);
+psReview.setInt(2, cleaningTypeId);
+ResultSet rsEligible = psReview.executeQuery();
 
-	/* ===============================
-	8. GET REVIEWS
+/* ===============================
+   8. FETCH REVIEWS
 ================================*/
-			PreparedStatement psReviews = conn.prepareStatement(
-				    "SELECT r.id, r.member_id, r.review_text, r.created_at, " +
-				    "       m.username, c.name " +
-				    "FROM cleaning_review r " +
-				    "JOIN member m ON r.member_id = m.id " +
-				    "JOIN cleaner c ON r.cleaner_id = c.id " +
-				    "WHERE r.cleaning_type_id = ? " +
-				    "ORDER BY r.created_at DESC"
-				);
-				psReviews.setInt(1, cleaningTypeId);
-				ResultSet rsReviews = psReviews.executeQuery();
-
+PreparedStatement psReviews = conn.prepareStatement(
+    "SELECT r.id, r.member_id, r.review_text, r.created_at, " +
+    "       m.username, c.name " +
+    "FROM cleaning_review r " +
+    "JOIN member m ON r.member_id = m.id " +
+    "JOIN cleaner c ON r.cleaner_id = c.id " +
+    "WHERE r.cleaning_type_id = ? " +
+    "ORDER BY r.created_at DESC"
+);
+psReviews.setInt(1, cleaningTypeId);
+ResultSet rsReviews = psReviews.executeQuery();
 %>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sprin cleaning</title>
+<title>Spring Cleaning</title>
 <link rel="stylesheet" href="cleaning.css">
 </head>
 
@@ -152,13 +152,16 @@ PreparedStatement psReview = conn.prepareStatement(
 </section>
 
 <div class="page-wrap">
-  <!-- LEFT FILTER PANEL -->
+
+  <!-- ===============================
+       LEFT FILTER PANEL (FIXED)
+  ================================== -->
   <aside class="filters">
-<form method="get" action="<%= ctx %>/Services/Cleaning/HouseKeeping.jsp">
+
+<form method="get"> <!-- FIXED: no redirect -->
       <h3>Price Range (S$ per hour)</h3>
       <label class="checkbox-row">
-        <input type="checkbox" name="priceOrder" value="asc" />
-        lowest to highest
+        <input type="checkbox" name="priceOrder" value="asc" /> lowest to highest
       </label>
 
       <h3>Language</h3>
@@ -175,47 +178,56 @@ PreparedStatement psReview = conn.prepareStatement(
         <input type="checkbox" name="lang" value="Tamil" /> Tamil
       </label>
       
-      <button type="submit" class="apply-btn">
-        apply
-      </button>
-    </form>
+      <button type="submit" class="apply-btn">apply</button>
+      <button type="button" class="reset-btn" onclick="resetFilters()">reset</button>
+</form>
 
-    <!-- CLEANING TYPE BUTTONS -->
-    <div class="cleaning-type-buttons">
-      <a href="<%= ctx %>/Services/Cleaning/HouseKeeping.jsp" class="type-btn active">
-        House keeping
-      </a>
-      <a href="<%= ctx %>/Services/Cleaning/springCleaning.jsp" class="type-btn">
-        Spring cleaning
-      </a>
-      <a href="<%= ctx %>/Services/Cleaning/postRenovation.jsp" class="type-btn">
-        post renovation/ move in/move out
-      </a>
-    </div>
+<!-- SERVICE BUTTONS -->
+<div class="cleaning-type-buttons">
+  <%
+    String currentPath = request.getRequestURI().substring(request.getContextPath().length());
+    while (rsSvc.next()) {
+        String svcName = rsSvc.getString("name");
+        String svcLink = rsSvc.getString("service_link");
+        String activeClass = currentPath.equals(svcLink) ? " active" : "";
+  %>
+    <a href="<%= ctx + svcLink %>" class="type-btn<%= activeClass %>"><%= svcName %></a>
+  <%
+    }
+  %>
+</div>
+
   </aside>
 
-  <!-- RIGHT CONTENT: CLEANER CARDS -->
+  <!-- ===============================
+       CLEANER CARDS
+  ================================== -->
   <main class="cleaner-section">
-  <h2 class="page-title">Spring Cleaning</h2>
-<p class="subtitle">Deep cleaning before CNY, or big events.</p>
 
+<h2 class="page-title">Spring Cleaning</h2>
+<p class="subtitle">Deep cleaning before CNY or special events.</p>
 
-    <div class="badges-row">
-      <span>✅ cancel anytime</span>
-      <span>✅ Legal workers</span>
-      <span>✅ friendly workers</span>
-      <span>✅ instant booking</span>
-    </div>
+<div class="badges-row">
+  <span>✅ cancel anytime</span>
+  <span>✅ Legal workers</span>
+  <span>✅ friendly workers</span>
+  <span>✅ instant booking</span>
+</div>
+
 <form method="get" action="<%= ctx %>/Services/Cleaning/bookCleaner.jsp">
+
+    <!-- FIXED: Hidden cleaning type -->
+    <input type="hidden" name="cleaningTypeId" value="<%= cleaningTypeId %>">
+
     <div class="cleaner-cards">
-        <%
+
+<%
 while (rsCleaners.next()) {
     int cleanerId = rsCleaners.getInt("id");
-    String name = rsCleaners.getString("Name");
+    String name = rsCleaners.getString("name");
     String race = rsCleaners.getString("race");
     String language = rsCleaners.getString("language");
     double hourly = rsCleaners.getDouble("hourly_rate");
-    int minHours = rsCleaners.getInt("min_work_hours");
     String photo = rsCleaners.getString("profile_url");
 
     String photoSrc = ctx + "/Services/Cleaning/Images/" + photo;
@@ -231,7 +243,6 @@ while (rsCleaners.next()) {
         <p class="cleaner-name"><%= name %> (<%= race %>)</p>
         <p>$<%= hourly %> per hour</p>
         <p><%= language %></p>
-        <p>minimum <%= minHours %> hours</p>
     </div>
 
     <button 
@@ -245,17 +256,17 @@ while (rsCleaners.next()) {
 </div>
 
 <% } %>
+
     </div>
 </form>
 
-
- <!-- LEAVING THE REVIEW -->
-
+  <!-- ===============================
+       LEAVE REVIEW
+  ================================== -->
 <h3>Leave a Review</h3>
 
 <form method="post" action="<%= ctx %>/Services/Cleaning/submitReview.jsp" class="review-form">
 
-    <!-- proper cleaning type -->
     <input type="hidden" name="cleaningTypeId" value="<%= cleaningTypeId %>">
 
     <label>Select cleaner you booked:</label>
@@ -277,23 +288,20 @@ while (rsCleaners.next()) {
         %>
     </select>
 
-    <br>
-
     <textarea 
         name="review_text" 
         class="review-textarea"
-        placeholder="Write your review..." 
+        placeholder="Write your review..."
         required>
     </textarea>
-
-    <br>
 
     <button type="submit" class="review-submit-btn">Submit Review</button>
 
 </form>
 
-
-<!-- SHOWING REVIEWS -->
+  <!-- ===============================
+       SHOW REVIEWS
+  ================================== -->
 <h3>Reviews</h3>
 
 <div class="reviews-list">
@@ -318,22 +326,20 @@ while (rsReviews.next()) {
     <p><%= reviewText %></p>
 
     <% if (reviewMemberId == memberId) { %>
-      <!-- Only show delete button for OWN reviews -->
       <form method="post"
             action="<%= ctx %>/Services/Cleaning/deleteReview.jsp"
             onsubmit="return confirm('Delete this review?');">
+
         <input type="hidden" name="reviewId" value="<%= reviewId %>">
         <input type="hidden" name="cleaningTypeId" value="<%= cleaningTypeId %>">
-        <button type="submit" class="review-delete-btn">
-          Delete my review
-        </button>
+
+        <button type="submit" class="review-delete-btn">Delete my review</button>
       </form>
     <% } %>
   </div>
 
 <%
-} // end while
-
+}
 if (!hasReviews) {
 %>
   <p>No reviews yet for this service.</p>
@@ -343,7 +349,8 @@ if (!hasReviews) {
 </div>
 
   </main>
-   <%
+
+<%
 rsCleaners.close();
 psCleaners.close();
 psSvc.close();
@@ -351,7 +358,14 @@ psReview.close();
 psReviews.close();
 conn.close();
 %>
-</div>
-</body>
 
+</div>
+
+<script>
+function resetFilters() {
+    window.location.href = "<%= ctx %>/Services/Cleaning/SpringCleaning.jsp";
+}
+</script>
+
+</body>
 </html>

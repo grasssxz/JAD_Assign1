@@ -4,7 +4,13 @@
 
 <%
 Class.forName("com.mysql.cj.jdbc.Driver");
-String connURL = "jdbc:mysql://localhost:3306/jad_assign1?user=root&paassword=1G9r5a6c1E**&serverTimezone=UTC";
+String connURL =
+"jdbc:mysql://localhost:3306/jad_assign1"
++ "?user=root"
++ "&password=1G9r5a6c1E**"
++ "&serverTimezone=UTC"
++ "&useSSL=false"
++ "&allowPublicKeyRetrieval=true";
 Connection conn = DriverManager.getConnection(connURL);
 
 String ctx = request.getContextPath();

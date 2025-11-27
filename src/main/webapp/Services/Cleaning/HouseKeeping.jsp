@@ -7,7 +7,6 @@
    1. SETUP & DB CONNECTION
 ================================*/
 Class.forName("com.mysql.cj.jdbc.Driver");
-Class.forName("com.mysql.cj.jdbc.Driver");
 String connURL =
 "jdbc:mysql://localhost:3306/jad_assign1"
 + "?user=root"
@@ -58,7 +57,7 @@ String priceOrder = request.getParameter("priceOrder");
 ================================*/
 StringBuilder sql = new StringBuilder(
  "SELECT c.id, c.name, c.profile_url, c.base_hourly_pay, c.race, c.language, " +
- "       c.min_work_hours, (c.base_hourly_pay + ct.pay_increment) AS hourly_rate " +
+ "       c.max_booking_per_day, (c.base_hourly_pay + ct.pay_increment) AS hourly_rate " +
  "FROM cleaner c " +
  "JOIN cleaner_cleaning_type cct ON c.id = cct.cleaner_id " +
  "JOIN cleaning_type ct ON ct.id = cct.cleaning_type_id " +
@@ -102,6 +101,10 @@ ResultSet rsCleaners = psCleaners.executeQuery();
 PreparedStatement psSvc = conn.prepareStatement(
     "SELECT name, service_link FROM service WHERE category_id = ?"
 );
+
+int cleaningCategoryId = 2; 
+psSvc.setInt(1, cleaningCategoryId);
+ResultSet rsSvc = psSvc.executeQuery();
 
 /* ===============================
 7. LEAVING A REVIEW
@@ -157,7 +160,7 @@ ResultSet rsEligible = psReview.executeQuery();
 <div class="page-wrap">
   <!-- LEFT FILTER PANEL -->
   <aside class="filters">
-<form method="get" action="<%= ctx %>/Services/Cleaning/HouseKeeping.jsp">
+<form method="get" action="<%= ctx %>/Services/Cleaning/SpringCleaning.jsp">
       <h3>Price Range (S$ per hour)</h3>
       <label class="checkbox-row">
         <input type="checkbox" name="priceOrder" value="asc" />
@@ -181,24 +184,32 @@ ResultSet rsEligible = psReview.executeQuery();
       <button type="submit" class="apply-btn">
         apply
       </button>
-      <button type="button" class="reset-btn" onclick="resetFilters()">reset</button>
-      <form id="filterForm" method="get" action="<%= ctx %>/Services/Cleaning/HouseKeeping.jsp">
-      
+      <button type="button" class="reset-btn" onclick="resetFilters()">
+        reset
+      </button>
+      </form>
 
-    </form>
-
-    <!-- CLEANING TYPE BUTTONS -->
+  <!-- to redirect to other cleaning pages -->
     <div class="cleaning-type-buttons">
-      <a href="<%= ctx %>/Services/Cleaning/HouseKeeping.jsp" class="type-btn active">
-        House keeping
-      </a>
-      <a href="<%= ctx %>/Services/Cleaning/SpringCleaning.jsp" class="type-btn">
-        Spring cleaning
-      </a>
-      <a href="<%= ctx %>/Services/Cleaning/PostRenovation.jsp" class="type-btn">
-        post renovation/ move in/move out
-      </a>
-    </div>
+  <%
+    String currentPath = request.getRequestURI().substring(request.getContextPath().length());
+
+    while (rsSvc.next()) {
+        String svcName = rsSvc.getString("name");
+        String svcLink = rsSvc.getString("service_link"); 
+        // e.g. store in DB as "/Services/Cleaning/HouseKeeping.jsp"
+
+        String activeClass = currentPath.equals(svcLink) ? " active" : "";
+  %>
+        <a href="<%= ctx + svcLink %>" class="type-btn<%= activeClass %>">
+          <%= svcName %>
+        </a>
+  <%
+    }
+  %>
+</div>
+  
+  
   </aside>
 
   <!-- RIGHT CONTENT: CLEANER CARDS -->
@@ -219,11 +230,11 @@ ResultSet rsEligible = psReview.executeQuery();
        <%
 while (rsCleaners.next()) {
     int cleanerId = rsCleaners.getInt("id");
-    String name = rsCleaners.getString("Name");
+    String name = rsCleaners.getString("name");
     String race = rsCleaners.getString("race");
     String language = rsCleaners.getString("language");
     double hourly = rsCleaners.getDouble("hourly_rate");
-    int minHours = rsCleaners.getInt("min_work_hours");
+    int maxHours = rsCleaners.getInt("max_booking_per_day");
     String photo = rsCleaners.getString("profile_url");
 
     String photoSrc = ctx + "/Services/Cleaning/Images/" + photo;
@@ -239,7 +250,6 @@ while (rsCleaners.next()) {
         <p class="cleaner-name"><%= name %> (<%= race %>)</p>
         <p>$<%= hourly %> per hour</p>
         <p><%= language %></p>
-        <p>minimum <%= minHours %> hours</p>
     </div>
 
     <button 
@@ -364,14 +374,10 @@ conn.close();
 
 <script>
 function resetFilters() {
-    // Reset all values in the form
-    document.querySelector('#filterForm').reset();
-
-    // Reload page WITHOUT parameters
-    window.location.href = '<%= ctx %>/Services/Cleaning/HouseKeeping.jsp';
+    // reload the page WITHOUT any filters
+    window.location.href = "<%= ctx %>/Services/Cleaning/SpringCleaning.jsp";
 }
 </script>
-
 </body>
 
 </html>

@@ -2,6 +2,8 @@
 <%@ page import="java.sql.*, java.util.*, java.time.*, java.time.format.*" %>
 
 
+
+
 <%
     String type = (String) session.getAttribute("type");
     if ("guest".equals(type)) {
@@ -10,12 +12,16 @@
     }
 
     Integer memberId = (Integer) session.getAttribute("member_id");
+    //fpr selecting dates
+    LocalDate today = LocalDate.now();
+    String todayStr = today.toString(); // e.g. "2025-11-26"
+    
+
 %>
 
 
 <%
 /* SETUP & PROFILE (same as before, if you like) */
-Class.forName("com.mysql.cj.jdbc.Driver");
 Class.forName("com.mysql.cj.jdbc.Driver");
 String connURL =
 "jdbc:mysql://localhost:3306/jad_assign1"
@@ -78,7 +84,7 @@ String cleaningTypeIdParam = request.getParameter("cleaningTypeId");
 
       <div>
         <label>Date: </label>
-        <input type="date" name="date" required>
+        <input type="date" name="date" required min="<%= todayStr %>">
       </div>
 
       <div>

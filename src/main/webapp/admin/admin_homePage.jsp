@@ -5,7 +5,13 @@
 
 <%
 Class.forName("com.mysql.cj.jdbc.Driver");
-String connURL = "jdbc:mysql://localhost:3306/jad_assign1?user=root&password=1G9r5a6c1E**&serverTimezone=UTC";
+String connURL =
+"jdbc:mysql://localhost:3306/jad_assign1"
++ "?user=root"
++ "&password=1G9r5a6c1E**"
++ "&serverTimezone=UTC"
++ "&useSSL=false"
++ "&allowPublicKeyRetrieval=true";
 Connection conn = DriverManager.getConnection(connURL);
 
 String username = (String) session.getAttribute("username");
@@ -237,6 +243,21 @@ while (rsCat.next()) {
 			   class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
 			    Edit Online Consult Packages
 			</a>
+			<a href="<%= ctx %>/admin/Doctor/Specialist/Appointments/ViewAppointments.jsp"
+			   class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
+			    Edit Specialist Appointments
+				</a>
+				<a href="<%= ctx %>/admin/Doctor/Specialist/Packages/ViewPackages.jsp"
+				   class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
+				    Edit Specialist Packages
+				</a>
+				<a href="<%= ctx %>/admin/Doctor/Specialist/Reviews/ViewReviews.jsp"
+				   class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
+				    Edit Specialist Reviews
+				</a>
+				
+				
+			
             
 <%
     }

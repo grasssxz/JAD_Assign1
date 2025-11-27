@@ -4,8 +4,11 @@
 <%
 String connURL =
 "jdbc:mysql://localhost:3306/jad_assign1"
-+ "?user=root&password=1G9r5a6c1E**"
-+ "&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
++ "?user=root"
++ "&password=1G9r5a6c1E**"
++ "&serverTimezone=UTC"
++ "&useSSL=false"
++ "&allowPublicKeyRetrieval=true";
 Class.forName("com.mysql.cj.jdbc.Driver");
 
 // session info
@@ -28,36 +31,34 @@ String message = null;
 
 /* ===============================
    DELETE BOOKING
-   - member: only delete own booking
    - admin: delete any booking
 ================================*/
 if ("delete".equals(action) && deleteId != null) {
     try (Connection connDel = DriverManager.getConnection(connURL)) {
 
+        int bookingId = Integer.parseInt(deleteId);
+
         if ("admin".equalsIgnoreCase(role)) {
-            PreparedStatement psDel = connDel.prepareStatement(
-                "DELETE FROM cleaner_booking WHERE id=?"
+            // 1) Delete related payments FIRST
+            PreparedStatement psDelPay = connDel.prepareStatement(
+                "DELETE FROM cleaner_payment WHERE booking_id = ?"
             );
-            psDel.setInt(1, Integer.parseInt(deleteId));
+            psDelPay.setInt(1, bookingId);
+            psDelPay.executeUpdate();
+            psDelPay.close();
+
+            // 2) Now delete the booking itself
+            PreparedStatement psDel = connDel.prepareStatement(
+                "DELETE FROM cleaner_booking WHERE id = ?"
+            );
+            psDel.setInt(1, bookingId);
             psDel.executeUpdate();
             psDel.close();
-
-        } else {
-            PreparedStatement psDel = connDel.prepareStatement(
-                "DELETE FROM cleaner_booking WHERE id=? AND member_id=?"
-            );
-            psDel.setInt(1, Integer.parseInt(deleteId));
-            psDel.setInt(2, sessionMemberId);
-            int rows = psDel.executeUpdate();
-            psDel.close();
-
-            if (rows == 0) {
-                message = "You can only delete your own bookings.";
-            }
         }
 
     } catch (Exception e) {
-        message = "Delete failed: " + e.getMessage();
+        // TEMP: print directly so you can see the issue if any
+        out.println("<p style='color:red'>Delete failed: " + e.getMessage() + "</p>");
     }
 
     // redirect to clear repeat delete
@@ -68,6 +69,7 @@ if ("delete".equals(action) && deleteId != null) {
     }
     return;
 }
+
 %>
 
 <!DOCTYPE html>
@@ -116,9 +118,6 @@ button {
 
 <h2><%= "admin".equalsIgnoreCase(role) ? "All Cleaner Bookings" : "My Cleaner Bookings" %></h2>
 
-<% if (message != null) { %>
-  <div class="msg"><%= message %></div>
-<% } %>
 
 <!-- ADMIN SEARCH -->
 <% if ("admin".equalsIgnoreCase(role)) { %>
@@ -213,7 +212,7 @@ while (rs.next()) {
       <a class="btn-del"
          onclick="return confirm('Delete this booking?');"
          href="viewCleanerBooking.jsp?action=delete&id=<%=rs.getInt("id")%><%= adminSearch ? "&member_id="+searchMember.trim() : "" %>">
-         Delete
+         Cancel
       </a>
     </td>
   </tr>

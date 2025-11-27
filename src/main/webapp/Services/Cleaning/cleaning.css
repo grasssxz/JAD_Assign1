@@ -64,7 +64,7 @@ body {
 }
 
 /* Apply button */
-.apply-btn{
+.apply-btn, .reset-btn{
   width:100%;
   margin-top:12px;
   padding:10px;
@@ -74,6 +74,12 @@ body {
   border-radius:8px;
   cursor:pointer;
 }
+
+
+.reset-btn:hover {
+  background:#cbd5e1;
+}
+
 
 /* Cleaning type buttons */
 .cleaning-type-buttons{

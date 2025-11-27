@@ -125,15 +125,14 @@
         <% }%>
 
         <!-- HOME -->
-        <a class="nav-link" href="<%= request.getContextPath() %>/admin/admin_homePage">Home</a>
+        <a class="nav-link" href="<%= request.getContextPath() %>/admin/admin_homePage.jsp">Home</a>
 
         <!-- BOOKINGS DROPDOWN -->
         <div class="dropdown">
             <a class="nav-link">View All Bookings ▼</a>
 			            <div class="dropdown-menu">
-			    <a href="<%= request.getContextPath() %>/admin/Doctor/DoctorAppt/AdminDocAppt/DocApptDashboard.jsp">
-				    Doctor Online Consult Bookings
-				</a>
+			    
+
 
 			
 			    <a href="<%= request.getContextPath() %>/admin/viewBooking/viewCleanerBooking.jsp">
