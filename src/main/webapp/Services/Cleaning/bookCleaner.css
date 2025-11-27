@@ -1,0 +1,145 @@
+/* Simple reset */
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f8f8f8;
+  color: #222;
+}
+
+/* Profile section (top bar under navbar) */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 30px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Main content wrapper (both pages) */
+.page-wrap {
+  padding: 20px 30px 40px;
+}
+
+.cleaner-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Titles */
+.page-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Optional smaller titles (payment page h3) */
+.cleaner-section h3 {
+  font-size: 18px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* Booking form (bookCleaner.jsp) */
+.booking-form {
+  max-width: 360px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.booking-form div {
+  margin-bottom: 16px;
+}
+
+.booking-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.booking-form input,
+.booking-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Buttons (both Confirm booking + Pay now) */
+.booking-form button,
+.cleaner-section form button {
+  width: 100%;
+  padding: 12px;
+  background: #4a6cf7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.booking-form button:hover,
+.cleaner-section form button:hover {
+  background: #3654d1;
+}
+
+/* Message text (both pages) */
+.message {
+  text-align: center;
+  color: red;
+  margin-bottom: 15px;
+}
+
+/* Payment page summary box */
+.cleaner-section ul {
+  list-style: none;
+  padding: 16px 20px;
+  margin: 0 auto 16px;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.cleaner-section ul li {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.cleaner-section ul li strong {
+  font-weight: 700;
+}
+
+.btn {
+  display: inline-block;
+  background: #64748b;
+  color: white;
+  padding: 6px 10px;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 4px;
+}
+.btn { padding: 6px 10px; border: 0; cursor: pointer; text-decoration:none; }
+.btn-edit { background:#4f46e5; color:white; }
+.btn-del { background:#dc2626; color:white; }
+.btn-save { background:#16a34a; color:white; }

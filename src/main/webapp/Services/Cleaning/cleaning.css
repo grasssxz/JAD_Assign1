@@ -1,0 +1,291 @@
+@charset "UTF-8";
+
+/* Simple reset */
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f8f8f8;
+  color: #222;
+  line-height: 1.5;
+}
+
+/* Profile section (top bar under navbar) */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 30px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* ====== MAIN LAYOUT (left filters + right content) ====== */
+.page-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 20px 30px 40px;
+}
+
+/* LEFT FILTER PANEL */
+.filters{
+  width:260px;
+  background:#ffe7ea;
+  padding:20px;
+  border-radius:18px;
+  flex-shrink: 0;
+}
+
+.filters h3{
+  margin: 14px 0 8px;
+  font-size:16px;
+}
+
+.checkbox-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:6px 0;
+  font-size:14px;
+}
+
+/* Apply button */
+.apply-btn{
+  width:100%;
+  margin-top:12px;
+  padding:10px;
+  background:#111;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* Cleaning type buttons */
+.cleaning-type-buttons{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.type-btn{
+  display:block;
+  text-align:center;
+  padding:10px;
+  border:2px solid #111;
+  border-radius:12px;
+  text-decoration:none;
+  color:#111;
+  background:#fff;
+  font-size:14px;
+}
+
+.type-btn.active{
+  background:#111;
+  color:#fff;
+}
+
+/* ====== RIGHT SIDE ====== */
+.cleaner-section {
+  flex: 1;
+  margin: 0 auto;
+  max-width: 1400px;   /* wide enough for your 4 cards to center */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+
+.page-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#555;
+  margin-bottom:16px;
+  font-size:14px;
+}
+
+/* badges row */
+.badges-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  justify-content:center;
+  margin:10px 0 20px;
+  font-size:14px;
+}
+
+/* Cleaner cards grid */
+/* Wrapper for all cards */
+.cleaner-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;              /* MORE space between cards */
+  justify-content: center;/* CENTER all cards */
+  padding-top: 20px;
+}
+
+/* Individual card */
+.cleaner-card {
+  width: 240px;            /* bigger card width */
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;               /* spacing INSIDE the card */
+}
+
+/* Card photo */
+.cleaner-photo {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Cleaner text */
+.cleaner-info p {
+  margin: 4px 0;
+  font-size: 15px;
+  color: #444;
+}
+
+.cleaner-name {
+  font-weight: bold;
+  font-size: 17px;
+  color: #222;
+}
+
+/* Book button */
+.book-cleaner-btn {
+  margin-top: auto;         /* pushes button to bottom for alignment */
+  width: 100%;
+  padding: 12px;
+  background: #4a6cf7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.book-cleaner-btn:hover {
+  background: #3654d1;
+}
+
+
+/* Message text (both pages) */
+.message {
+  text-align: center;
+  color: red;
+  margin-bottom: 15px;
+}
+
+/* Payment page summary box */
+.cleaner-section ul {
+  list-style: none;
+  padding: 16px 20px;
+  margin: 0 auto 16px;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.cleaner-section ul li {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.cleaner-section ul li strong {
+  font-weight: 700;
+}
+
+/* -----------------------------
+   REVIEW SECTION
+------------------------------*/
+.reviews-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Each Review Card */
+.review-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-left: 5px solid #7f9cf5;  /* matches your buttons */
+}
+
+.review-card p {
+    margin: 4px 0;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+/* Reviewer name */
+.review-card strong {
+    font-size: 16px;
+    color: #374151;      /* deep gray */
+}
+
+/* Cleaner name */
+.review-card em {
+    color: #6366f1;      /* soft purple/indigo */
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Review text content */
+.review-card .review-text {
+    margin-top: 6px;
+    font-size: 14.5px;
+    color: #4b5563;      /* slate gray */
+}
+
+/* Delete button */
+.review-delete-btn {
+    background: #e53935;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.review-delete-btn:hover {
+    background: #c62828;
+}
+
+/* No reviews text */
+.no-reviews {
+    font-size: 15px;
+    color: #6b7280;      /* cool gray */
+    margin-top: 10px;
+}
